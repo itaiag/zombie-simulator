@@ -1,90 +1,89 @@
 package agmon.zombie.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.newdawn.slick.geom.Circle;
 
 public class Person extends AbstractEntity {
 
-	public static final int TIME_SHOOTING = 1000;
-	
-	public enum State {
-		WALKING, SHOOTING
+	public enum MovingState {
+		WALKING, RUNNING, STANDING
 	}
 
-	private State state;
+	private MovingState movingState;
 
-	private Random rand;
+	private int runningTimer;
 
-	private int shootingTimer;
+	private int changeDirectionTimer;
 
-	public Person(int x, int y) {
-		super(new Circle(x, y, 3));
-		state = State.WALKING;
+	private int respondedToCollisionTimer;
+
+	private final EntityAdder entities;
+
+	public Person(EntityAdder entities, int x, int y) {
+		super(new Circle(x, y, 3), 10);
+		this.entities = entities;
+		movingState = MovingState.WALKING;
 		direction = Direction.values()[new Random().nextInt(Direction.values().length)];
-		rand = new Random();
 	}
 
 	@Override
 	public void update(int delta) {
-		shootingTimer -= delta;
-		if (shootingTimer <= 0) {
-			state = State.WALKING;
+		changeDirectionTimer -= delta;
+		respondedToCollisionTimer -= delta;
+		if (changeDirectionTimer <= 0) {
+			changeDirectionTimer = 10000;
+			direction = Direction.values()[new Random().nextInt(Direction.values().length)];
+
 		}
-		move(1);
+		if (movingState == MovingState.RUNNING) {
+			runningTimer -= delta;
+			if (runningTimer <= 0) {
+				movingState = MovingState.WALKING;
+			}
+		}
+		switch (movingState) {
+		case RUNNING:
+			move(3);
+			break;
+		case STANDING:
+			break;
+		case WALKING:
+			move(2);
+			break;
+
+		}
 	}
 
-	public void wallCollision(Direction direction) {
-		List<Direction> options = new ArrayList<Direction>();
-		switch (direction) {
-		case NORTH:
-			options.add(Direction.SOUTH);
-			options.add(Direction.SOUTH_EAST);
-			options.add(Direction.SOUTH_WEST);
-			break;
-		case SOUTH:
-			options.add(Direction.NORTH);
-			options.add(Direction.NORTH_EAST);
-			options.add(Direction.NORTH_WEST);
-			break;
-		case EAST:
-			options.add(Direction.WEST);
-			options.add(Direction.NORTH_WEST);
-			options.add(Direction.SOUTH_WEST);
-			break;
-		case WEST:
-			options.add(Direction.EAST);
-			options.add(Direction.NORTH_EAST);
-			options.add(Direction.SOUTH_EAST);
-			break;
-		default:
+	@Override
+	public void collide(AbstractEntity other) {
+		if (respondedToCollisionTimer > 0) {
 			return;
 		}
+		respondedToCollisionTimer = 10;
+		if (other instanceof Zombie) {
+			int action = rand.nextInt(4);
+			if (action == 0) {
+				// attack
+				Noise noise = new Noise(getX(), getY());
+				entities.add(noise);
+				((Zombie) other).setExist(false);
+				//
+			} else if (action == 1) {
+				// Running
+				movingState = MovingState.RUNNING;
+				runningTimer = 1000;
+				moveFrom(other.getX(), other.getY());
 
-		this.direction = options.get(rand.nextInt(options.size()));
-	}
+			} else if (action == 2 || action == 3){
+				// Becoming a zombie
+				setExist(false);
+				Zombie zombie = new Zombie(getX(), getY());
+				entities.add(zombie);
+			}
 
-	public boolean isCollide(Person other) {
-		return shape.intersects(other.shape);
-	}
+		}
 
-	public void personCollide(Person person1) {
-		state = State.SHOOTING;
-		shootingTimer = TIME_SHOOTING;
 	}
-
-	public State getState() {
-		return state;
-	}
-
-	public int getShootingTimer() {
-		return shootingTimer;
-	}
-	
-	
-	
-	
 
 }

@@ -3,13 +3,14 @@ package agmon.zombie.controller;
 import java.util.List;
 
 import agmon.zombie.Common;
+import agmon.zombie.model.AbstractEntity;
 import agmon.zombie.model.Direction;
-import agmon.zombie.model.Person;
+import agmon.zombie.model.Noise;
 
 public class CollisionDetector {
 
-	public void detect(List<Person> people) {
-		for (Person person : people) {
+	public void detect(List<AbstractEntity> entities) {
+		for (AbstractEntity person : entities) {
 			if (person.getX() <= 0) {
 				person.wallCollision(Direction.WEST);
 			} else if (person.getX() >= Common.WIDTH) {
@@ -21,13 +22,16 @@ public class CollisionDetector {
 			}
 		}
 
-		for (Person person0 : people) {
-			for (Person person1 : people) {
-				if (person0 == person1) {
+		for (AbstractEntity entity0 : entities) {
+			for (AbstractEntity entity1 : entities) {
+				if (entity0 == entity1) {
 					continue;
 				}
-				if (person0.isCollide(person1)) {
-					person1.personCollide(person1);
+				if (entity0 instanceof Noise){
+					continue;
+				}
+				if (entity0.isCollide(entity1)) {
+					entity0.collide(entity1);
 				}
 			}
 		}

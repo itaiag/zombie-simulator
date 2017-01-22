@@ -7,7 +7,10 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
 
+import agmon.zombie.model.AbstractEntity;
+import agmon.zombie.model.Noise;
 import agmon.zombie.model.Person;
+import agmon.zombie.model.Zombie;
 
 public class Renderer {
 
@@ -18,23 +21,33 @@ public class Renderer {
 
 	}
 
-	public void renderPeople(List<Person> people) {
-		
-		for (Person person : people) {
-			Circle circle = (Circle) person.getShape();
-			if (person.getState() == Person.State.SHOOTING) {
-				g.setColor(Color.red);
-				g.fill(circle);
-				g.setColor(new Color(10,0,person.getShootingTimer() -100));
-				Circle newCirc = new Circle(circle.getCenterX(), circle.getCenterY(), (Person.TIME_SHOOTING - person.getShootingTimer()) / 10);
-				g.draw(newCirc);
-			} else {
-				g.setColor(Color.green);
-				g.fill(circle);
-				
+	public void renderEntities(List<AbstractEntity> people) {
+
+		for (AbstractEntity entity : people) {
+			if (entity instanceof Person) {
+				renderPerson((Person) entity);
+			} else if (entity instanceof Noise) {
+				renderNoise((Noise) entity);
+			} else if (entity instanceof Zombie) {
+				renderZombie((Zombie) entity);
 			}
 		}
+	}
 
+	private void renderZombie(Zombie entity) {
+		g.setColor(Color.red);
+		g.fill(entity.getShape());
+	}
+
+	private void renderNoise(Noise noise) {
+		Circle circle = (Circle) noise.getShape();
+		g.setColor(new Color(100, 0, 255 - noise.getRadius() * 5));
+		g.draw(circle);
+	}
+
+	private void renderPerson(Person person) {
+		g.setColor(Color.green);
+		g.fill(person.getShape());
 	}
 
 }
