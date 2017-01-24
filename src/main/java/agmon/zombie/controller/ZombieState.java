@@ -21,7 +21,7 @@ public class ZombieState extends BasicGame {
 	
 	private CollisionDetector colDetector;
 	
-	private int numberOfPeople = 600;
+	private int numberOfPeople = 50;
 	
 	private int numberOfZombies = 3;
 
