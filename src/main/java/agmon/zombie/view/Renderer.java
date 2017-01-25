@@ -1,10 +1,12 @@
 package agmon.zombie.view;
 
+import java.awt.Font;
 import java.util.List;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Circle;
 
 import agmon.zombie.model.AbstractEntity;
@@ -16,8 +18,12 @@ public class Renderer {
 
 	private final Graphics g;
 
+	private TrueTypeFont font;
+
 	public Renderer(GameContainer container) {
 		this.g = container.getGraphics();
+		Font awtFont = new Font("Times New Roman", Font.BOLD, 8);
+		font = new TrueTypeFont(awtFont, false);
 
 	}
 
@@ -46,7 +52,11 @@ public class Renderer {
 	}
 
 	private void renderPerson(Person person) {
-		g.setColor(Color.green);
+		g.setColor(Color.white);
+		g.setFont(font);
+		g.drawString(person.getExperience() + "", (float) person.getX() - 3,
+				(float) (person.getShape().getCenterY() - 14));
+		g.setColor(new Color(0, 150 + person.getExperience() * 25, 0));
 		g.fill(person.getShape());
 	}
 

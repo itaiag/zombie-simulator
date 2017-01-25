@@ -12,6 +12,8 @@ public class Person extends AbstractEntity {
 
 	private MovingState movingState;
 
+	private int experience;
+
 	private int runningTimer;
 
 	private int changeDirectionTimer;
@@ -20,11 +22,14 @@ public class Person extends AbstractEntity {
 
 	private final EntityAdder entities;
 
+	private final Dice dice;
+
 	public Person(EntityAdder entities, int x, int y) {
 		super(new Circle(x, y, 3), 10);
 		this.entities = entities;
 		movingState = MovingState.WALKING;
 		direction = Direction.values()[new Random().nextInt(Direction.values().length)];
+		dice = new Dice();
 	}
 
 	@Override
@@ -61,29 +66,45 @@ public class Person extends AbstractEntity {
 			return;
 		}
 		respondedToCollisionTimer = 10;
+		float experienceAffect = 0.05f * experience;
+		if (experienceAffect > 0.3f) {
+			experienceAffect = 0.3f;
+		}
 		if (other instanceof Zombie) {
-			int action = rand.nextInt(4);
-			if (action == 0) {
-				// attack
-				Noise noise = new Noise(getX(), getY());
-				entities.add(noise);
-				((Zombie) other).setExist(false);
-				//
-			} else if (action == 1) {
+			switch (dice.throwDice(0.5f - experienceAffect)) {
+			case 0:
 				// Running
 				movingState = MovingState.RUNNING;
 				runningTimer = 1000;
 				moveFrom(other.getX(), other.getY());
+				break;
+			case 1:
+				// attack
+				Noise noise = new Noise(getX(), getY());
+				entities.add(noise);
+				switch (dice.throwDice(0.5f - experienceAffect)) {
+				case 0:
+					// Becoming a zombie
+					setExist(false);
+					Zombie zombie = new Zombie(getX(), getY());
+					entities.add(zombie);
+					break;
+				case 1:
+					((Zombie) other).setExist(false);
+					experience++;
+					break;
+				}
+				break;
+			default:
+				throw new IllegalStateException("Unkown percentage");
 
-			} else if (action == 2 || action == 3){
-				// Becoming a zombie
-				setExist(false);
-				Zombie zombie = new Zombie(getX(), getY());
-				entities.add(zombie);
 			}
-
 		}
 
+	}
+
+	public int getExperience() {
+		return experience;
 	}
 
 }

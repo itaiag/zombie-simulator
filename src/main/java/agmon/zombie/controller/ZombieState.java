@@ -21,9 +21,9 @@ public class ZombieState extends BasicGame {
 	
 	private CollisionDetector colDetector;
 	
-	private int numberOfPeople = 50;
+	private int numberOfPeople = 200;
 	
-	private int numberOfZombies = 3;
+	private int numberOfZombies = 10;
 
 	public ZombieState(String title) {
 		super(title);
