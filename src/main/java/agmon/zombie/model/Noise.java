@@ -6,7 +6,7 @@ public class Noise extends AbstractEntity {
 
 	private static final int MAX_RADIUS = 85;
 
-	public Noise(int x, int y) {
+	public Noise(float x, float y) {
 		super(new Circle(x, y, 5), 5);
 	}
 

@@ -25,25 +25,25 @@ public abstract class AbstractEntity {
 		rand = new Random();
 	}
 
-	public int getX() {
-		return (int) shape.getCenterX();
+	public float getX() {
+		return shape.getCenterX();
 	}
 
-	public int getY() {
-		return (int) shape.getCenterY();
+	public float getY() {
+		return shape.getCenterY();
 	}
 
-	protected void moveX(int deltaX) {
+	protected void moveX(float deltaX) {
 		shape.setCenterX(shape.getCenterX() + deltaX);
 		sight.setCenterX(shape.getCenterX());
 	}
 
-	protected void moveY(int deltaY) {
+	protected void moveY(float deltaY) {
 		shape.setCenterY(shape.getCenterY() + deltaY);
 		sight.setCenterY(shape.getCenterY());
 	}
 
-	protected void move(int delta) {
+	protected void move(float delta) {
 		switch (direction) {
 		case NORTH:
 			moveY(-delta);
@@ -79,7 +79,7 @@ public abstract class AbstractEntity {
 
 	}
 	
-	protected void moveFrom(int x, int y) {
+	protected void moveFrom(float x, float y) {
 		int tolerance = 10;
 		Direction tempDir = Direction.CENTER;
 		if (getX() < x - tolerance) {
@@ -108,8 +108,8 @@ public abstract class AbstractEntity {
 		
 	}
 
-	protected void moveTo(int x, int y) {
-		int tolerance = 10;
+	protected void moveTo(float x, float y) {
+		int tolerance = 2;
 		Direction tempDir = Direction.CENTER;
 		if (getX() < x - tolerance) {
 			tempDir = Direction.EAST;

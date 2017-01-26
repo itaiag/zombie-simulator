@@ -6,8 +6,8 @@ public class Dice {
 	
 	private final Random rand;
 	
-	public Dice(){
-		rand = new Random();
+	public Dice(Random rand){
+		this.rand = rand;
 	}
 	
 	public int throwDice(float... percentage){

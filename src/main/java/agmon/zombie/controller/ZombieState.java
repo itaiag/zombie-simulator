@@ -16,14 +16,14 @@ import agmon.zombie.view.Renderer;
 public class ZombieState extends BasicGame {
 
 	private EntityStore store;
-	
+
 	private Renderer renderer;
-	
+
 	private CollisionDetector colDetector;
-	
+
 	private int numberOfPeople = 200;
-	
-	private int numberOfZombies = 10;
+
+	private int numberOfZombies = 5;
 
 	public ZombieState(String title) {
 		super(title);
@@ -38,14 +38,14 @@ public class ZombieState extends BasicGame {
 		store = new EntityStore();
 		Random rand = new Random();
 		for (int i = 0; i < numberOfPeople; i++) {
-			Person person = new Person(store,rand.nextInt(Common.WIDTH - 50), rand.nextInt(Common.HEIGHT - 50));
+			Person person = new Person(store, rand.nextInt(Common.WIDTH - 50), rand.nextInt(Common.HEIGHT - 50));
 			store.add(person);
 		}
 		for (int i = 0; i < numberOfZombies; i++) {
 			Zombie zombie = new Zombie(rand.nextInt(Common.WIDTH - 50), rand.nextInt(Common.HEIGHT - 50));
 			store.add(zombie);
 		}
-		
+
 		renderer = new Renderer(container);
 		colDetector = new CollisionDetector();
 

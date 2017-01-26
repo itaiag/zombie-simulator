@@ -7,9 +7,9 @@ import org.newdawn.slick.geom.Circle;
 public class Zombie extends AbstractEntity {
 
 	private int changeDirectionTimer;
-
-	public Zombie(int x, int y) {
-		super(new Circle(x, y, 3), 10);
+	
+	public Zombie(float x, float y) {
+		super(new Circle(x, y, 3), 30);
 		direction = Direction.values()[new Random().nextInt(Direction.values().length)];
 	}
 
@@ -26,10 +26,11 @@ public class Zombie extends AbstractEntity {
 
 	@Override
 	public void collide(AbstractEntity other) {
-		if (other instanceof Noise) {
-			moveTo(other.getX(), other.getY());
-		}
 		if (other instanceof Person) {
+			moveTo(other.getX(), other.getY());
+			changeDirectionTimer = 1000;
+		}
+		else if (changeDirectionTimer >= 0 && other instanceof Noise) {
 			moveTo(other.getX(), other.getY());
 		}
 	}

@@ -12,6 +12,7 @@ import org.newdawn.slick.geom.Circle;
 import agmon.zombie.model.AbstractEntity;
 import agmon.zombie.model.Noise;
 import agmon.zombie.model.Person;
+import agmon.zombie.model.Turning;
 import agmon.zombie.model.Zombie;
 
 public class Renderer {
@@ -36,8 +37,15 @@ public class Renderer {
 				renderNoise((Noise) entity);
 			} else if (entity instanceof Zombie) {
 				renderZombie((Zombie) entity);
+			} else if (entity instanceof Turning) {
+				renderTurning((Turning)entity);
 			}
 		}
+	}
+
+	private void renderTurning(Turning turning) {
+		g.setColor(Color.blue);
+		g.fill(turning.getShape());
 	}
 
 	private void renderZombie(Zombie entity) {
@@ -47,7 +55,7 @@ public class Renderer {
 
 	private void renderNoise(Noise noise) {
 		Circle circle = (Circle) noise.getShape();
-		g.setColor(new Color(100, 0, 255 - noise.getRadius() * 5));
+		g.setColor(new Color(95 - noise.getRadius(), 0, 255 - noise.getRadius() * 5));
 		g.draw(circle);
 	}
 

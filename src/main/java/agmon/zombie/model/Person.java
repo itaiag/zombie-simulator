@@ -7,7 +7,7 @@ import org.newdawn.slick.geom.Circle;
 public class Person extends AbstractEntity {
 
 	public enum MovingState {
-		WALKING, RUNNING, STANDING
+		WALKING, RUNNING
 	}
 
 	private MovingState movingState;
@@ -24,12 +24,12 @@ public class Person extends AbstractEntity {
 
 	private final Dice dice;
 
-	public Person(EntityAdder entities, int x, int y) {
-		super(new Circle(x, y, 3), 10);
+	public Person(EntityAdder entities, float x, float y) {
+		super(new Circle(x, y, 3), 30);
 		this.entities = entities;
 		movingState = MovingState.WALKING;
 		direction = Direction.values()[new Random().nextInt(Direction.values().length)];
-		dice = new Dice();
+		dice = new Dice(rand);
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class Person extends AbstractEntity {
 		changeDirectionTimer -= delta;
 		respondedToCollisionTimer -= delta;
 		if (changeDirectionTimer <= 0) {
-			changeDirectionTimer = 10000;
+			changeDirectionTimer = 5000;
 			direction = Direction.values()[new Random().nextInt(Direction.values().length)];
 
 		}
@@ -50,8 +50,6 @@ public class Person extends AbstractEntity {
 		switch (movingState) {
 		case RUNNING:
 			move(3);
-			break;
-		case STANDING:
 			break;
 		case WALKING:
 			move(2);
@@ -67,44 +65,69 @@ public class Person extends AbstractEntity {
 		}
 		respondedToCollisionTimer = 10;
 		float experienceAffect = 0.05f * experience;
-		if (experienceAffect > 0.3f) {
-			experienceAffect = 0.3f;
+		if (experienceAffect > 0.35f) {
+			experienceAffect = 0.35f;
 		}
 		if (other instanceof Zombie) {
-			switch (dice.throwDice(0.5f - experienceAffect)) {
+			switch (dice.throwDice(0.6f - experienceAffect)) {
 			case 0:
 				// Running
-				movingState = MovingState.RUNNING;
-				runningTimer = 1000;
-				moveFrom(other.getX(), other.getY());
+				flee(other);
 				break;
 			case 1:
 				// attack
-				Noise noise = new Noise(getX(), getY());
-				entities.add(noise);
-				switch (dice.throwDice(0.5f - experienceAffect)) {
-				case 0:
-					// Becoming a zombie
-					setExist(false);
-					Zombie zombie = new Zombie(getX(), getY());
-					entities.add(zombie);
-					break;
-				case 1:
-					((Zombie) other).setExist(false);
-					experience++;
-					break;
-				}
+				attack(other, experienceAffect);
 				break;
 			default:
 				throw new IllegalStateException("Unkown percentage");
 
 			}
+		} else if (other instanceof Turning) {
+			other.setExist(false);
 		}
 
+	}
+
+	private void attack(AbstractEntity other, float experienceAffect) {
+		if (shape.intersects(other.getShape())) {
+			if (dice.throwDice(0.66f) == 0){
+				Noise noise = new Noise(getX(), getY());
+				entities.add(noise);
+			}
+			switch (dice.throwDice(0.6f - experienceAffect)) {
+			case 0:
+				lose();
+				break;
+			case 1:
+				win(other);
+				break;
+			}
+		} else {
+			moveTo(other.getX(), other.getY());
+		}
+	}
+
+	private void win(AbstractEntity other) {
+		((Zombie) other).setExist(false);
+		experience++;
+	}
+
+	private void lose() {
+		// Becoming a zombie
+		setExist(false);
+		Turning turning = new Turning(entities, getX(), getY());
+		entities.add(turning);
+	}
+
+	private void flee(AbstractEntity other) {
+		movingState = MovingState.RUNNING;
+		runningTimer = 1000;
+		moveFrom(other.getX(), other.getY());
 	}
 
 	public int getExperience() {
 		return experience;
 	}
+	
 
 }
