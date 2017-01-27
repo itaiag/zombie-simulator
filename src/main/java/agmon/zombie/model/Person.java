@@ -6,15 +6,13 @@ import org.newdawn.slick.geom.Circle;
 
 public class Person extends AbstractEntity {
 
-	public enum MovingState {
-		WALKING, RUNNING
+	public enum State {
+		WALKING, FLEEING, ATTACKING
 	}
 
-	private MovingState movingState;
+	private State state;
 
 	private int experience;
-
-	private int runningTimer;
 
 	private int changeDirectionTimer;
 
@@ -24,10 +22,12 @@ public class Person extends AbstractEntity {
 
 	private final Dice dice;
 
+	private AbstractEntity other;
+
 	public Person(EntityAdder entities, float x, float y) {
 		super(new Circle(x, y, 3), 30);
 		this.entities = entities;
-		movingState = MovingState.WALKING;
+		state = State.WALKING;
 		direction = Direction.values()[new Random().nextInt(Direction.values().length)];
 		dice = new Dice(rand);
 	}
@@ -41,20 +41,32 @@ public class Person extends AbstractEntity {
 			direction = Direction.values()[new Random().nextInt(Direction.values().length)];
 
 		}
-		if (movingState == MovingState.RUNNING) {
-			runningTimer -= delta;
-			if (runningTimer <= 0) {
-				movingState = MovingState.WALKING;
-			}
-		}
-		switch (movingState) {
-		case RUNNING:
+		updateWalkingState(delta);
+		switch (state) {
+		case FLEEING:
+			setDirectionFrom(other.getX(), other.getY());
 			move(3);
 			break;
 		case WALKING:
 			move(2);
 			break;
+		case ATTACKING:
+			setDirectionTo(other.getX(), other.getY());
+			attack();
+			break;
 
+		}
+	}
+
+	private void updateWalkingState(int delta) {
+		if (null == other) {
+			state = State.WALKING;
+			return;
+		}
+		if (!isCollide(other)) {
+			state = State.WALKING;
+			other = null;
+			return;
 		}
 	}
 
@@ -64,51 +76,57 @@ public class Person extends AbstractEntity {
 			return;
 		}
 		respondedToCollisionTimer = 10;
-		float experienceAffect = 0.05f * experience;
-		if (experienceAffect > 0.35f) {
-			experienceAffect = 0.35f;
-		}
+		float experienceAffect = calculateExperienceAffect();
 		if (other instanceof Zombie) {
+			this.other = other;
 			switch (dice.throwDice(0.6f - experienceAffect)) {
 			case 0:
-				// Running
-				flee(other);
+				state = State.FLEEING;
 				break;
 			case 1:
-				// attack
-				attack(other, experienceAffect);
+				state = State.ATTACKING;
 				break;
 			default:
 				throw new IllegalStateException("Unkown percentage");
 
 			}
 		} else if (other instanceof Turning) {
-			other.setExist(false);
+			if (this.getShape().intersects(other.getShape())){
+				other.setExist(false);
+			}
 		}
 
 	}
 
-	private void attack(AbstractEntity other, float experienceAffect) {
-		if (shape.intersects(other.getShape())) {
-			if (dice.throwDice(0.66f) == 0){
-				Noise noise = new Noise(getX(), getY());
-				entities.add(noise);
-			}
-			switch (dice.throwDice(0.6f - experienceAffect)) {
-			case 0:
-				lose();
-				break;
-			case 1:
-				win(other);
-				break;
-			}
-		} else {
-			moveTo(other.getX(), other.getY());
+	private float calculateExperienceAffect() {
+		float experienceAffect = 0.05f * experience;
+		if (experienceAffect > 0.35f) {
+			experienceAffect = 0.35f;
+		}
+		return experienceAffect;
+	}
+
+	private void attack() {
+		if (!shape.intersects(other.getShape())) {
+			return;
+		}
+		if (dice.throwDice(0.66f) == 0) {
+			Noise noise = new Noise(getX(), getY());
+			entities.add(noise);
+		}
+		switch (dice.throwDice(0.6f - calculateExperienceAffect())) {
+		case 0:
+			lose();
+			break;
+		case 1:
+			win();
+			break;
 		}
 	}
 
-	private void win(AbstractEntity other) {
-		((Zombie) other).setExist(false);
+	private void win() {
+		other.setExist(false);
+		other = null;
 		experience++;
 	}
 
@@ -119,15 +137,8 @@ public class Person extends AbstractEntity {
 		entities.add(turning);
 	}
 
-	private void flee(AbstractEntity other) {
-		movingState = MovingState.RUNNING;
-		runningTimer = 1000;
-		moveFrom(other.getX(), other.getY());
-	}
-
 	public int getExperience() {
 		return experience;
 	}
-	
 
 }

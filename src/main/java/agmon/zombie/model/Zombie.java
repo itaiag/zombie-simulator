@@ -27,11 +27,11 @@ public class Zombie extends AbstractEntity {
 	@Override
 	public void collide(AbstractEntity other) {
 		if (other instanceof Person) {
-			moveTo(other.getX(), other.getY());
+			setDirectionTo(other.getX(), other.getY());
 			changeDirectionTimer = 1000;
 		}
 		else if (changeDirectionTimer >= 0 && other instanceof Noise) {
-			moveTo(other.getX(), other.getY());
+			setDirectionTo(other.getX(), other.getY());
 		}
 	}
 

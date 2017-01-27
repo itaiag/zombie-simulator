@@ -79,7 +79,7 @@ public abstract class AbstractEntity {
 
 	}
 	
-	protected void moveFrom(float x, float y) {
+	protected void setDirectionFrom(float x, float y) {
 		int tolerance = 10;
 		Direction tempDir = Direction.CENTER;
 		if (getX() < x - tolerance) {
@@ -108,7 +108,7 @@ public abstract class AbstractEntity {
 		
 	}
 
-	protected void moveTo(float x, float y) {
+	protected void setDirectionTo(float x, float y) {
 		int tolerance = 2;
 		Direction tempDir = Direction.CENTER;
 		if (getX() < x - tolerance) {
