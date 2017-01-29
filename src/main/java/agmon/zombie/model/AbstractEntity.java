@@ -33,6 +33,14 @@ public abstract class AbstractEntity {
 		return shape.getCenterY();
 	}
 
+	public void setX(float x) {
+		shape.setCenterX(x);
+	}
+
+	public void setY(float y) {
+		shape.setCenterY(y);
+	}
+
 	protected void moveX(float deltaX) {
 		shape.setCenterX(shape.getCenterX() + deltaX);
 		sight.setCenterX(shape.getCenterX());
@@ -78,7 +86,7 @@ public abstract class AbstractEntity {
 		}
 
 	}
-	
+
 	protected void setDirectionFrom(float x, float y) {
 		int tolerance = 10;
 		Direction tempDir = Direction.CENTER;
@@ -105,7 +113,7 @@ public abstract class AbstractEntity {
 			}
 		}
 		direction = tempDir;
-		
+
 	}
 
 	protected void setDirectionTo(float x, float y) {

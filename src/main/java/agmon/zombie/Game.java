@@ -5,11 +5,9 @@ import org.newdawn.slick.SlickException;
 
 import agmon.zombie.controller.ZombieState;
 
-public class Game  {
+public class Game {
 
-	
-
-	private static final String GAME_NAME = "Zombie Simulator";
+	private static final String GAME_NAME = "Zombie Apocalypse Simulator";
 
 	public static void main(String[] args) {
 		AppGameContainer appgc;
@@ -25,5 +23,4 @@ public class Game  {
 			e.printStackTrace();
 		}
 	}
-
 }

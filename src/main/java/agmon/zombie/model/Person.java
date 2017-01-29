@@ -37,7 +37,7 @@ public class Person extends AbstractEntity {
 		changeDirectionTimer -= delta;
 		respondedToCollisionTimer -= delta;
 		if (changeDirectionTimer <= 0) {
-			changeDirectionTimer = 5000;
+			changeDirectionTimer = 4500 + rand.nextInt(1000);
 			direction = Direction.values()[new Random().nextInt(Direction.values().length)];
 
 		}
@@ -91,7 +91,7 @@ public class Person extends AbstractEntity {
 
 			}
 		} else if (other instanceof Turning) {
-			if (this.getShape().intersects(other.getShape())){
+			if (this.getShape().intersects(other.getShape())) {
 				other.setExist(false);
 			}
 		}

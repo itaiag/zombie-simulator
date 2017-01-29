@@ -29,6 +29,7 @@ public class ZombieState extends BasicGame {
 		super(title);
 	}
 
+	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		renderer.renderEntities(store.getEntities());
 	}
